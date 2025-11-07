@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+    <timestamp key="runTime" datePattern="yyyyMMdd_HHmmss"/>
+    <!-- Appender console -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Appender thread -->
+    <appender name="THREAD_FILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator class="ch.qos.logback.classic.sift.MDCBasedDiscriminator">
+            <key>threadName</key>
+            <defaultValue>main</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${threadName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>logs/${runTime}-${threadName}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>logs/${threadName}.%d{yyyy-MM-dd}.log</fileNamePattern>
+                    <maxHistory>5</maxHistory>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+
+    <!-- Appender root -->
+    <logger name="com.auto" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="THREAD_FILE"/>
+    </logger>
+
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
